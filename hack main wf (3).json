@@ -1,0 +1,109 @@
+{
+  "name": "hack main wf",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "campus-main",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        48,
+        -128
+      ],
+      "id": "e85c5c28-cff7-4913-9221-1a23a2b27a63",
+      "name": "Webhook",
+      "webhookId": "58c08b06-f0e3-4644-b1a9-6fc5ced5e2da"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "mode": "list",
+          "value": "2020gnpht@gmail.com"
+        },
+        "start": "={{$json[\"body\"][\"date\"] + \"T\" + $json[\"body\"][\"time\"] + \":00+05:30\"}}",
+        "end": "={{$json[\"body\"][\"date\"] + \"T\" + $json[\"body\"][\"time\"] + \":00+05:30\"}}",
+        "additionalFields": {
+          "summary": "={{\"Reminder: \" + $json[\"eventName\"] + \" is scheduled on \" + $json[\"date\"] + \" at \" + $json[\"time\"]}}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        464,
+        80
+      ],
+      "id": "5473d0e4-0acf-4f0f-8de9-976e8df06cdc",
+      "name": "Create an event",
+      "retryOnFail": false,
+      "executeOnce": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "szucw32RFPniU2BP",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5678/webhook/campus-whatsapp",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"body\": {\n    \"eventName\": \"{{$json[\"eventName\"]}}\",\n    \"date\": \"{{$json[\"date\"]}}\",\n    \"time\": \"{{$json[\"time\"]}}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e0a4242e-41f4-4bf3-ad0a-429535a53b28",
+      "name": "HTTP Request"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "any"
+  },
+  "versionId": "643ddbe5-4e2d-4d44-91c9-9bef11cfbca7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5e9091938c3670099c31220196273a6f5d40c4818f46aba4f23cd401bbc98741"
+  },
+  "id": "2eiTlEju8SsYP4fF",
+  "tags": []
+}
